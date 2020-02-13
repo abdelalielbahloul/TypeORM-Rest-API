@@ -29,15 +29,21 @@ class AuthController {
       return;
     }
 
-    //Sing JWT, valid for 1 hour
-    const token = jwt.sign(
-      { userId: user.id, username: user.username },
-      config.jwtSecret,
-      { expiresIn: "1h" }
+    //Sign JWT, valid for 1 hour
+    const token = jwt.sign({ 
+                  userId: user.id, 
+                  username: user.username 
+                },
+                config.jwtSecret,
+                { expiresIn: "1h" }
     );
 
     //Send the jwt in the response
-    res.send(token);
+    res.send({
+      "success": true,
+      "token": token,
+      "expiredIn": "1h"
+    });
   };
 
   static changePassword = async (req: Request, res: Response) => {

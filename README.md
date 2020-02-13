@@ -1,13 +1,14 @@
 # Project Build with TypeORM Express And JWT
 
-Steps to run this project:
+1. Steps to run this project:
 
 1. Execute `npm i` command
 2. Setup your database settings inside `ormconfig.json` file
 3. Execute `npm start` command
 
-To Create a migration
-# To Read More About TypeORM Migration Docs
+2. To Create a migration
+To Read More About TypeORM Migration Docs
+
 + http://typeorm.io/#/migrations
 
 

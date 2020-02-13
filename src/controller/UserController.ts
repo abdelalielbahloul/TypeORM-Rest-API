@@ -6,7 +6,7 @@ import { User } from "../entity/User";
 
 class UserController{
 
-static listAll = async (req: Request, res: Response) => {
+static index = async (req: Request, res: Response) => {
   //Get users from database
   const userRepository = getRepository(User);
   const users = await userRepository.find({
@@ -17,9 +17,9 @@ static listAll = async (req: Request, res: Response) => {
   res.send(users);
 };
 
-static getOneById = async (req: Request, res: Response) => {
+static show = async (req: Request, res: Response) => {
   //Get the ID from the url
-  const id: number = req.params.id;
+  const id: any = req.params.id;
 
   //Get the user from database
   const userRepository = getRepository(User);
@@ -32,7 +32,7 @@ static getOneById = async (req: Request, res: Response) => {
   }
 };
 
-static newUser = async (req: Request, res: Response) => {
+static create = async (req: Request, res: Response) => {
   //Get parameters from the body
   let { username, password, role } = req.body;
   let user = new User();
@@ -63,7 +63,7 @@ static newUser = async (req: Request, res: Response) => {
   res.status(201).send("User created");
 };
 
-static editUser = async (req: Request, res: Response) => {
+static edit = async (req: Request, res: Response) => {
   //Get the ID from the url
   const id = req.params.id;
 
@@ -101,7 +101,7 @@ static editUser = async (req: Request, res: Response) => {
   res.status(204).send();
 };
 
-static deleteUser = async (req: Request, res: Response) => {
+static delete = async (req: Request, res: Response) => {
   //Get the ID from the url
   const id = req.params.id;
 

@@ -10,19 +10,19 @@
       "@types/jsonwebtoken": "^8.3.7",
       "@types/node": "^8.0.29",
       "ts-node": "3.3.0",
+      "ts-node-dev": "^1.0.0-pre.44",
       "typescript": "3.3.3333"
    },
    "dependencies": {
       "bcryptjs": "^2.4.3",
       "class-validator": "^0.11.0",
       "cors": "^2.8.5",
-      "dotenv": "^8.2.0",
       "express": "^4.15.4",
       "helmet": "^3.21.2",
       "jsonwebtoken": "^8.5.1",
+      "mongodb": "^3.5.3",
       "reflect-metadata": "^0.1.10",
       "sqlite3": "^4.0.3",
-      "ts-node-dev": "^1.0.0-pre.44",
       "typeorm": "0.2.22"
    },
    "scripts": {

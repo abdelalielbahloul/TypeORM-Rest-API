@@ -1,5 +1,5 @@
 import "reflect-metadata";
-import { createConnection } from "typeorm";
+import { getConnection, createConnection } from "typeorm";
 import * as express from "express";
 import * as bodyParser from "body-parser";
 import * as helmet from "helmet";
@@ -8,7 +8,7 @@ import routes from "./routes";
 
 
 //Connects to the Database -> then starts the express
-createConnection()
+createConnection("default")
   .then(async connection => {
     // Create a new express application instance
     const app = express();

@@ -4,15 +4,20 @@ import {
     Column,
     Unique,
     CreateDateColumn,
-    UpdateDateColumn
+    UpdateDateColumn,
+    BaseEntity,
+    ManyToOne,
+    JoinColumn,
+    OneToOne
   } from "typeorm";
-  import { Length, IsNotEmpty } from "class-validator";
+  import { Length, IsNotEmpty, IsEmpty } from "class-validator";
   import * as bcrypt from "bcryptjs";
+import { UserRole } from "./UserRole";
   
-  @Entity({ database: "devDatabase"  })
+  @Entity()
   @Unique(["username"])
   export class User {
-    @PrimaryGeneratedColumn()
+    @PrimaryGeneratedColumn("increment")
     id: number;
   
     @Column()
@@ -22,10 +27,10 @@ import {
     @Column()
     @Length(4, 100)
     password: string;
-  
-    @Column()
-    @IsNotEmpty()
-    role: string;
+    
+    @OneToOne(type => UserRole)
+    @JoinColumn()
+    role: UserRole;
   
     @Column()
     @CreateDateColumn()

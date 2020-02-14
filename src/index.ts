@@ -5,10 +5,13 @@ import * as bodyParser from "body-parser";
 import * as helmet from "helmet";
 import * as cors from "cors";
 import routes from "./routes";
+import 'dotenv/config';
 
+const port = process.env.PORT || 3000;
+const ServerHost = process.env.SERVER_HOST || '127.0.0.1';
 
 //Connects to the Database -> then starts the express
-createConnection("default")
+createConnection("devDatabase")
   .then(async connection => {
     // Create a new express application instance
     const app = express();
@@ -21,8 +24,8 @@ createConnection("default")
     //Set all routes from routes folder
     app.use("/", routes);
 
-    app.listen(3000, () => {
-      console.log("Server started on port 3000!");
+    app.listen(port, () => {
+      console.log(`Server started on ${ServerHost}:${port}`);
     });
   })
-  .catch(error => console.log(error));
+  .catch(error => console.error(error));

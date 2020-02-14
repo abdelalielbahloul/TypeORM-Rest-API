@@ -12,6 +12,6 @@ To Read More About TypeORM Migration Docs
 + http://typeorm.io/#/migrations
 
 
-1. Execute `typeorm migration:create -n migrationName` command
+1. Execute `typeorm migration:create -n migrationName` command if you want to create an empty migration file
 2. Check if the server is runing if not execute `npm start` command
 3. To apply the creating migration execute `npm run migration:run` command

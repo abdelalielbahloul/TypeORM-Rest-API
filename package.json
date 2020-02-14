@@ -22,6 +22,7 @@
       "helmet": "^3.21.2",
       "jsonwebtoken": "^8.5.1",
       "mongodb": "^3.5.3",
+      "mysql": "^2.18.1",
       "reflect-metadata": "^0.1.10",
       "sqlite3": "^4.0.3",
       "typeorm": "0.2.22"

@@ -1,5 +1,5 @@
 {
-   "name": "jwt-express-typeorm",
+   "name": "typeormrestapi",
    "version": "0.0.1",
    "description": "project developed with TypeORM Express and JWT.",
    "devDependencies": {
@@ -17,6 +17,7 @@
       "bcryptjs": "^2.4.3",
       "class-validator": "^0.11.0",
       "cors": "^2.8.5",
+      "dotenv": "^8.2.0",
       "express": "^4.15.4",
       "helmet": "^3.21.2",
       "jsonwebtoken": "^8.5.1",
@@ -29,6 +30,7 @@
       "tsc": "tsc",
       "start": "set debug=* && ts-node-dev --respawn --transpileOnly ./src/index.ts",
       "prod": "tsc && node ./build/app.js",
-      "migration:run": "ts-node ./node_modules/typeorm/cli.js migration:run"
+      "migration:run": "ts-node ./node_modules/typeorm/cli.js migration:run",
+      "migration:generate": "ts-node ./node_modules/typeorm/cli.js migration:generate"
    }
 }

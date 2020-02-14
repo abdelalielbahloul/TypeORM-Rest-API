@@ -2,6 +2,7 @@ import { Router } from "express";
 import UserController from "../controller/UserController";
 import checkJwt  from "../middlewars/checkJwt";
 import checkRole from "../middlewars/checkRole";
+import { UserRole } from "../entity/UserRole";
 
 const router = Router();
 

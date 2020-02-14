@@ -1,16 +1,16 @@
 import { Request, Response } from "express";
-import { getRepository } from "typeorm";
+import { getRepository, getConnection } from "typeorm";
 import { validate } from "class-validator";
 
 import { User } from "../entity/User";
 
-class UserController{
+class UserController {
 
 static index = async (req: Request, res: Response) => {
   //Get users from database
-  const userRepository = getRepository(User);
+  const userRepository = getConnection("mysqlDatabase").getRepository(User);
   const users = await userRepository.find({
-    select: ["id", "username", "role"] //We dont want to send the passwords on response
+    select: ["id", "username", "role"] //We don't want to send the passwords on response
   });
 
   //Send the users object
@@ -22,7 +22,7 @@ static show = async (req: Request, res: Response) => {
   const id: any = req.params.id;
 
   //Get the user from database
-  const userRepository = getRepository(User);
+  const userRepository = getConnection("mysqlDatabase").getRepository(User);
   try {
     const user = await userRepository.findOneOrFail(id, {
       select: ["id", "username", "role"] //We dont want to send the password on response
@@ -51,7 +51,7 @@ static create = async (req: Request, res: Response) => {
   user.hashPassword();
 
   //Try to save. If fails, the username is already in use
-  const userRepository = getRepository(User);
+  const userRepository = getConnection("mysqlDatabase").getRepository(User);
   try {
     await userRepository.save(user);
   } catch (e) {
@@ -71,7 +71,7 @@ static edit = async (req: Request, res: Response) => {
   const { username, role } = req.body;
 
   //Try to find user on database
-  const userRepository = getRepository(User);
+  const userRepository = getConnection("mysqlDatabase").getRepository(User);
   let user;
   try {
     user = await userRepository.findOneOrFail(id);
@@ -105,7 +105,7 @@ static delete = async (req: Request, res: Response) => {
   //Get the ID from the url
   const id = req.params.id;
 
-  const userRepository = getRepository(User);
+  const userRepository = getConnection("mysqlDatabase").getRepository(User);
   let user: User;
   try {
     user = await userRepository.findOneOrFail(id);

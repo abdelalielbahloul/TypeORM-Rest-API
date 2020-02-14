@@ -1,13 +1,14 @@
 import { Request, Response } from "express";
 import * as jwt from "jsonwebtoken";
-import { getRepository } from "typeorm";
+import { getRepository, Repository, getConnection, Connection } from "typeorm";
 import { validate } from "class-validator";
 
 import { User } from "../entity/User";
 import config from "../config/config";
+import { UserRole } from "../entity/UserRole";
 
 class AuthController {
-  static login = async (req: Request, res: Response) => {
+   static login = async (req: Request, res: Response) => {
     //Check if username and password are set
     let { username, password } = req.body;
     if (!(username && password)) {
@@ -15,7 +16,7 @@ class AuthController {
     }
 
     //Get user from database
-    const userRepository = getRepository(User);
+    const userRepository = getConnection("mysqlDatabase").getRepository(User);
     let user: User;
     try {
       user = await userRepository.findOneOrFail({ where: { username } });
@@ -46,6 +47,54 @@ class AuthController {
     });
   };
 
+  static register = async (req: Request, res: Response) => {
+      
+    let { username, password, roleId } = req.body;
+    const roleRepository = await getConnection("mysqlDatabase").getRepository(UserRole);
+    const userRole = await roleRepository.findOne(roleId);
+    if (userRole == null) {
+      res.status(404).send({
+        "message": "Role not found"
+      })
+      res.end();
+      return;
+    }
+
+    if (!req.body) {
+      res.status(505).send("BadRequest")
+      res.end();
+    }
+    let newUser = new User();
+
+    newUser.username = username;
+    newUser.password = password;
+    newUser.hashPassword();
+    newUser.role = userRole;
+    const userRepository = getConnection("mysqlDatabase").getRepository(User);
+    try {
+      await userRepository
+      .save(newUser)
+      .then(row => {
+          res.status(200).send({
+            "success": true,
+            "message": "Registered successfuly!"
+          })
+      })
+      .catch(err => {
+        res.status(401).send({
+          "error": err.errmsg
+        })
+
+      })
+      
+    } catch (error) {
+      console.error(error);
+      
+    }
+    
+    
+  }
+
   static changePassword = async (req: Request, res: Response) => {
     //Get ID from JWT
     const id = res.locals.jwtPayload.userId;
@@ -57,7 +106,7 @@ class AuthController {
     }
 
     //Get user from the database
-    const userRepository = getRepository(User);
+    const userRepository = getConnection("mysqlDatabase").getRepository(User);
     let user: User;
     try {
       user = await userRepository.findOneOrFail(id);

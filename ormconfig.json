@@ -1,10 +1,19 @@
 [
+  
    {
-      "name": "default",
-      "type": "sqlite",
-      "database": "database.sqlite",
+      "name": "mongoDatabase",
+      "type": "mongodb",
+      "host": "localhost",
+      "port": 27017,
+      "database": "typeormDB",
+      "poolSize": 10,
+      "ssl": false,
+      "autoReconnect": false,
+      "keepAlive": 30000,
+      "connectTimeoutMS": 30000,
+      "forceServerObjectId": true,
       "synchronize": true,
-      "logging": false,
+      "logging": true,
       "entities": [
          "src/entity/**/*.ts"
       ],
@@ -21,18 +30,15 @@
       }
    },
    {
-      "name": "devDatabase",
-      "type": "mongodb",
+      "name": "mysqlDatabase",
+      "type": "mysql",
+      "host": "localhost",
+      "port": 3306,
+      "username": "root",
+      "password": "",
       "database": "typeormDB",
-      "poolSize": 10,
-      "ssl": false,
-      "autoReconnect": false,
-      "keepAlive": 30000,
-      "connectTimeoutMS": 30000,
-      "forceServerObjectId": true,
-      "url": "mongodb://localhost:27017/typeormDB",
       "synchronize": true,
-      "logging": false,
+      "logging": true,
       "entities": [
          "src/entity/**/*.ts"
       ],

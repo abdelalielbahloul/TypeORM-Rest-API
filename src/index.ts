@@ -1,5 +1,5 @@
 import "reflect-metadata";
-import { getConnection, createConnection } from "typeorm";
+import { createConnection } from "typeorm";
 import * as express from "express";
 import * as bodyParser from "body-parser";
 import * as helmet from "helmet";
@@ -11,8 +11,11 @@ const port = process.env.PORT || 3000;
 const ServerHost = process.env.SERVER_HOST || '127.0.0.1';
 
 //Connects to the Database -> then starts the express
-createConnection("devDatabase")
-  .then(async connection => {
+
+const cnx = createConnection("mysqlDatabase");
+
+  cnx.then(async connection => {
+    
     // Create a new express application instance
     const app = express();
 
@@ -25,6 +28,7 @@ createConnection("devDatabase")
     app.use("/", routes);
 
     app.listen(port, () => {
+      console.log(`Connected to ${connection.options.type} database named ${connection.options.database}`);
       console.log(`Server started on ${ServerHost}:${port}`);
     });
   })

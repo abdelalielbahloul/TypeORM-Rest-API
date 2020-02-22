@@ -12,7 +12,7 @@ class AuthController {
     //Check if username and password are set
     let { login, password } = req.body;
     if (!(login && password)) {
-      res.status(400).send("Login faild!");
+      res.status(400).send({ msg: "Login faild!" });
     }
 
     //Get user from database
@@ -21,12 +21,12 @@ class AuthController {
     try {
       user = await userRepository.findOneOrFail({ where: { login } });
     } catch (error) {
-      res.status(401).send("Login faild!");
+      res.status(401).send({ msg: "Login faild!" });
     }
 
     //Check if encrypted password match
     if (!user.checkIfUnencryptedPasswordIsValid(password)) {
-      res.status(401).send("Login faild!");
+      res.status(401).send({ msg: "Login faild!" });
       return;
     }
 
@@ -41,14 +41,18 @@ class AuthController {
 
     //Send the jwt in the response
     res.send({
-      "success": true,
-      "token": token,
-      "expiredIn": "1h"
+      success: true,
+      token: token,
+      expiredIn: "1h"
     });
   };
 
   static register = async (req: Request, res: Response) => {
       
+    if(!req.body) {
+      res.status(400).json("bad Request");
+      return;
+    }
     //Get parameters from the body
     let { firstName, lastName, email, userName, password, role } = req.body;
     let user = new User();
@@ -61,37 +65,47 @@ class AuthController {
 
     //validate the sent role
     const roleRepository = getConnection("mysqlDatabase").getRepository(UserRole);
-    roleRepository.findOneOrFail(role)
-    .then( async () => {
-      //Validade if the parameters are ok
-      const errors = await validate(user);
-      if (errors.length > 0) {
-        res.status(400).send(errors);
-        return;
-      }
+    const sentRole = await roleRepository.findOne({ where: { id: role } });
+    
+    if(sentRole != undefined) {
 
-      //Hash the password, to securely store on DB
-      user.hashPassword();
-
-      //Try to save. If fails, the username is already in use
-      const userRepository = getConnection("mysqlDatabase").getRepository(User);
       try {
-        await userRepository.save(user);
-      } catch (e) {
-        res.status(409).send({
-          "success": false,
-          error: e
-        });
+        //Validade if the parameters are ok
+        const errors = await validate(user);
+        if (errors.length > 0) {
+          res.status(400).send(errors);
+          return;
+        }
+
+        //Hash the password, to securely store on DB
+        user.hashPassword();
+
+        //Try to save. If fails, the username is already in use
+        const userRepository = getConnection("mysqlDatabase").getRepository(User);
+        try {
+          await userRepository.save(user);
+        } catch (e) {
+          res.status(409).send({
+            success: false,
+            error: e
+          });
+          return;
+        }
+      } catch (error) {
+        res.status(400).json(error);
         return;
       }
-
       //If all ok, send 201 response
       res.status(201).send("User created successfully!");
-    }).catch( err => {
-      res.status(400).send(err);
+
+    } else {
+      res.status(404).send({
+        success: false,
+        error: "User Role Not Found"
+      });
       return;
-    })
-    
+    }
+      
   }
 
   static changePassword = async (req: Request, res: Response) => {

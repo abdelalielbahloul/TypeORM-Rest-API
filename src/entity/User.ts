@@ -15,17 +15,29 @@ import {
 import { UserRole } from "./UserRole";
   
   @Entity()
-  @Unique(["username"])
+  @Unique(["username", "email"])
   export class User {
     @PrimaryGeneratedColumn("increment")
     id: number;
   
     @Column()
-    @Length(4, 20)
-    username: string;
+    @Length(4, 60)
+    firstName: string;
+
+    @Column()
+    @Length(4, 60)
+    lastName: string;
+
+    @Column()
+    @Length(4, 60)
+    userName: string;
+
+    @Column()
+    @Length(4, 255)
+    email: string;
   
     @Column()
-    @Length(4, 100)
+    @Length(4, 255)
     password: string;
     
     @OneToOne(type => UserRole)

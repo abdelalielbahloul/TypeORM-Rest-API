@@ -8,32 +8,32 @@ import config from "../config/config";
 import { UserRole } from "../entity/UserRole";
 
 class AuthController {
-   static login = async (req: Request, res: Response) => {
+  static login = async (req: Request, res: Response) => {
     //Check if username and password are set
-    let { username, password } = req.body;
-    if (!(username && password)) {
-      res.status(400).send();
+    let { login, password } = req.body;
+    if (!(login && password)) {
+      res.status(400).send("Login faild!");
     }
 
     //Get user from database
     const userRepository = getConnection("mysqlDatabase").getRepository(User);
     let user: User;
     try {
-      user = await userRepository.findOneOrFail({ where: { username } });
+      user = await userRepository.findOneOrFail({ where: { login } });
     } catch (error) {
-      res.status(401).send();
+      res.status(401).send("Login faild!");
     }
 
     //Check if encrypted password match
     if (!user.checkIfUnencryptedPasswordIsValid(password)) {
-      res.status(401).send();
+      res.status(401).send("Login faild!");
       return;
     }
 
     //Sign JWT, valid for 1 hour
     const token = jwt.sign({ 
                   userId: user.id, 
-                  username: user.username 
+                  username: user.userName 
                 },
                 config.jwtSecret,
                 { expiresIn: "1h" }
@@ -49,49 +49,48 @@ class AuthController {
 
   static register = async (req: Request, res: Response) => {
       
-    let { username, password, roleId } = req.body;
-    const roleRepository = await getConnection("mysqlDatabase").getRepository(UserRole);
-    const userRole = await roleRepository.findOne(roleId);
-    if (userRole == null) {
-      res.status(404).send({
-        "message": "Role not found"
-      })
-      res.end();
+    //Get parameters from the body
+    let { firstName, lastName, email, userName, password, role } = req.body;
+    let user = new User();
+    user.firstName = firstName;
+    user.lastName = lastName;
+    user.email = email;
+    user.userName = userName;
+    user.password = password;
+    user.role = role;
+
+    //validate the sent role
+    const roleRepository = getConnection("mysqlDatabase").getRepository(UserRole);
+    roleRepository.findOneOrFail(role)
+    .then( async () => {
+      //Validade if the parameters are ok
+      const errors = await validate(user);
+      if (errors.length > 0) {
+        res.status(400).send(errors);
+        return;
+      }
+
+      //Hash the password, to securely store on DB
+      user.hashPassword();
+
+      //Try to save. If fails, the username is already in use
+      const userRepository = getConnection("mysqlDatabase").getRepository(User);
+      try {
+        await userRepository.save(user);
+      } catch (e) {
+        res.status(409).send({
+          "success": false,
+          error: e
+        });
+        return;
+      }
+
+      //If all ok, send 201 response
+      res.status(201).send("User created successfully!");
+    }).catch( err => {
+      res.status(400).send(err);
       return;
-    }
-
-    if (!req.body) {
-      res.status(505).send("BadRequest")
-      res.end();
-    }
-    let newUser = new User();
-
-    newUser.username = username;
-    newUser.password = password;
-    newUser.hashPassword();
-    newUser.role = userRole;
-    const userRepository = getConnection("mysqlDatabase").getRepository(User);
-    try {
-      await userRepository
-      .save(newUser)
-      .then(row => {
-          res.status(200).send({
-            "success": true,
-            "message": "Registered successfuly!"
-          })
-      })
-      .catch(err => {
-        res.status(401).send({
-          "error": err.errmsg
-        })
-
-      })
-      
-    } catch (error) {
-      console.error(error);
-      
-    }
-    
+    })
     
   }
 

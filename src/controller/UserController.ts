@@ -9,9 +9,17 @@ class UserController {
 static index = async (req: Request, res: Response) => {
   //Get users from database
   const userRepository = getConnection("mysqlDatabase").getRepository(User);
-  const users = await userRepository.find({
-    select: ["id", "username", "role"] //We don't want to send the passwords on response
-  });
+  const users = await userRepository
+                  .find({ select: [
+                    "id", 
+                    "firstName", 
+                    "lastName", 
+                    "email", 
+                    "userName", 
+                    "role", 
+                    "createdAt", 
+                    "updatedAt"
+                  ]})
 
   //Send the users object
   res.send(users);
@@ -25,7 +33,16 @@ static show = async (req: Request, res: Response) => {
   const userRepository = getConnection("mysqlDatabase").getRepository(User);
   try {
     const user = await userRepository.findOneOrFail(id, {
-      select: ["id", "username", "role"] //We dont want to send the password on response
+       select: [
+        "id", 
+        "firstName", 
+        "lastName", 
+        "email", 
+        "userName", 
+        "role", 
+        "createdAt", 
+        "updatedAt"
+      ]
     });
   } catch (error) {
     res.status(404).send("User not found");
@@ -34,9 +51,12 @@ static show = async (req: Request, res: Response) => {
 
 static create = async (req: Request, res: Response) => {
   //Get parameters from the body
-  let { username, password, role } = req.body;
+  let { firstName, lastName, email, userName, password, role } = req.body;
   let user = new User();
-  user.username = username;
+  user.firstName = firstName;
+  user.lastName = lastName;
+  user.email = email;
+  user.userName = userName;
   user.password = password;
   user.role = role;
 
@@ -55,12 +75,15 @@ static create = async (req: Request, res: Response) => {
   try {
     await userRepository.save(user);
   } catch (e) {
-    res.status(409).send("username already in use");
+    res.status(409).send({
+      "success": false,
+      error: e
+    });
     return;
   }
 
   //If all ok, send 201 response
-  res.status(201).send("User created");
+  res.status(201).send("User created successfully!");
 };
 
 static edit = async (req: Request, res: Response) => {
